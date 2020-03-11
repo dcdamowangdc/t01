@@ -1,0 +1,53 @@
+git config --global user.name  "dcdamowangdc"
+git config --global user.email "445900866"
+
+cd <file>
+git init
+
+ls -a
+
+
+git add d01.txt
+git commit -m "第一次提交"
+
+
+git status
+
+git diff //修改明细
+
+git log
+git log --pretty=oneline
+git reflog 
+
+git reset --hard head^
+git reset --hard head^^
+git reset --hard d32c41c9b0efab2cfb37d9058d5a47d27c251cf0 
+
+//让这个filename文件回到最后一次 git commit 或者 git add时的状态
+git checkout -- d01.txt
+
+ssh-keygen -t rsa -C "445900866@qq.com"
+/c/Users/44590/.ssh/id_rsa
+
+//id_rsa私钥
+//id_rsa.pub 公钥
+
+
+shh -T git@github.com
+
+//关联
+git remote add origin git@github.com:dcdamowangdc/t01.git
+//先拉
+git pull origin master --allow-unrelated-histories
+git push origin master
+
+git clone git@github.com:dcdamowangdc/t01.git
+
+//分支
+git branch 
+git branch dc_branch01
+git checkout dc_branch01
+//创建并切换到该分支
+git checkout -b dc_branch01
+
+git merge dc_branch01
