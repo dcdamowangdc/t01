@@ -1,0 +1,234 @@
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>wordMap</title>
+  <style>
+    html, body, #viewDiv {
+      padding: 0;
+      margin: 0;
+      height: 100%;
+      width: 100%;
+    }
+    </style>
+    <link rel="stylesheet" href="https://js.arcgis.com/4.13/esri/css/main.css">
+    <script src="https://js.arcgis.com/4.13/"></script>
+
+    <script>
+    require([
+      "esri/Map",
+      "esri/views/MapView",
+      "esri/widgets/BasemapToggle",
+      "esri/widgets/BasemapGallery",
+      "esri/layers/FeatureLayer",
+       "esri/views/layers/support/FeatureFilter",
+        "esri/Basemap",
+        "esri/widgets/Legend",
+        "esri/widgets/Expand"
+    ], function(Map, MapView, BasemapToggle, BasemapGallery, FeatureLayer, FeatureFilter, Basemap, Legend, Expand) {
+
+        var countryData = {
+        title: "<a href="+"countryInfo/"+"{英文名}>{ 英文名 }</a",
+        content:[{
+            type: "fields",
+            fieldInfos: [
+                {
+                    fieldName: "国家",
+                    label: "国家",
+                    isEditable: true,
+                    tooltip: "",
+                    visible: true,
+                    format: null,
+                    stringFieldOption: "text-box"
+                },
+                {
+                    fieldName: "板块",
+                    label: "板块",
+                    isEditable: true,
+                    tooltip: "",
+                    visible: true,
+                    format: null,
+                    stringFieldOption: "text-box"
+                },
+                {
+                    fieldName: "年份",
+                    label: "年份",
+                    isEditable: true,
+                    tooltip: "",
+                    visible: true,
+                    format: null,
+                    stringFieldOption: "text-box"
+                },
+                {
+                    fieldName: "五通指数",
+                    label: "五通指数",
+                    isEditable: true,
+                    tooltip: "",
+                    visible: true,
+                    format: null,
+                    stringFieldOption: "text-box"
+                },
+                {
+                    fieldName: "五通年度排名",
+                    label: "五通年度排名",
+                    isEditable: true,
+                    tooltip: "",
+                    visible: true,
+                    format: null,
+                    stringFieldOption: "text-box"
+                },
+                {
+                    fieldName: "风险指数",
+                    label: "风险指数",
+                    isEditable: true,
+                    tooltip: "",
+                    visible: true,
+                    format: null,
+                    stringFieldOption: "text-box"
+                },
+                {
+                    fieldName: "风险年度排名",
+                    label: "风险年度排名",
+                    isEditable: true,
+                    tooltip: "",
+                    visible: true,
+                    format: null,
+                    stringFieldOption: "text-box"
+                }
+            ]
+        }]
+        };
+
+        var countryLabels = {
+        symbol: {
+          type: "text",
+          color: "#6dff12",
+          haloColor: "#5E8D74",
+          haloSize: "2px",
+          font: {
+            size: "20px",
+            family: "Noto Sans",
+            style: "italic",
+            weight: "normal"
+          }
+        },
+        labelPlacement: "above-center",
+        labelExpressionInfo: {
+          expression: "$feature.国家"
+        }
+      };
+
+        var colorVisVar = {
+  // The type must be set to color for the renderer to know it will use color
+  type: "color",
+  // Assign the field name to visualize with color (number of smart phone owners)
+  field: "五通指数",
+  // If normalizing set the field to normalize by (in this case total population)
+  //normalizationField: "五通指数",
+  // Set the color ramp based on two values (min/max) and two colors
+  stops: [{ value: 7, color: "#FFFCD4" }, { value: 40, color: "#edff9a" }, { value: 80, color: "#0D2644" }]
+};
+
+        var sizeVisVar = {
+  // The type must be set to size for the renderer to know size will be altered
+  type: "size",
+  // Assign the field name to visualize with size (total population)
+  field: "五通指数",
+  // Set the field to normalize the values by (in this case square miles)
+  //normalizationField: "五通指数",
+  valueUnit: "unknown",
+  // Create a size ramp based on the min/max values
+  stops: [{ value: 7, size: 3 }, { value: 80, size: 25 }]
+};
+
+        var rendererdc = {
+  type: "simple", // autocasts as new SimpleRenderer()
+  // Define a default marker symbol.
+  symbol: { type: "simple-marker" }, // autocasts as new SimpleMarkerSymbol()
+  // Set the color and size visual variables on the renderer
+  visualVariables: [colorVisVar, sizeVisVar]
+};
+
+        var countryLayer = new FeatureLayer({
+            //url: "https://services5.arcgis.com/7hUL1VQmk65LYgrE/arcgis/rest/services/2010/FeatureServer/0",
+            url: "https://services5.arcgis.com/7hUL1VQmk65LYgrE/arcgis/rest/services/ydyl_ft_fx/FeatureServer/0",
+            //outFields: ["国家", "板块", "年份", "五通指数","英文名"],
+            outFields: ["*"],
+            popupTemplate: countryData,
+            labelingInfo: [countryLabels],
+            renderer: rendererdc,
+          });
+
+        var map = new Map({
+            basemap: "gray-vector",
+            layers:  [countryLayer]
+            //basemap: dbasemap
+        });
+                var view = new MapView({
+            container: "viewDiv",
+            map: map,
+            center: [118.05459,24.29278],
+            zoom: 2,
+        });
+                const legend = new Legend({
+          view: view,
+          container: "legendDiv"
+        });
+
+        map.add(countryLayer,1);
+        const infoDiv = document.getElementById("infoDiv");
+        view.ui.add(
+          new Expand({
+            view: view,
+            content: infoDiv,
+            expandIconClass: "esri-icon-layer-list",
+            expanded: true
+          }),
+          "top-right"
+        );
+
+        view.when().then(function() {
+          view.whenLayerView(countryLayer).then(function(layerView) {
+            const filterSelect = document.getElementById("filter");
+            // filters the layer using a definitionExpression
+            // based on a religion selected by the user
+            filterSelect.addEventListener("change", function(event) {
+              const newValue = event.target.value;
+              const whereClause = newValue
+                ? "年份 = " + newValue
+                : null;
+              layerView.filter = {
+                where: whereClause
+              };
+              // close popup for former cluster that no longer displays
+              view.popup.close();
+            });
+          });
+        });
+
+        });
+  </script>
+</head>
+<body>
+    <div id="viewDiv"></div>
+<div id="infoDiv" class="esri-widget">
+      Filter by year:
+      <select id="filter" class="esri-select">
+        <option value="2010">2010</option>
+        <option value="2011">2011</option>
+        <option value="2012">2012</option>
+        <option value="2013">2013</option>
+        <option value="2014">2014</option>
+        <option value="2015">2015</option>
+        <option value="2016">2016</option>
+          <option value="2017">2017</option>
+      </select>
+      <div style="padding-top: 10px;">
+        <button id="toggle-cluster" class="esri-button">
+          图例
+        </button>
+      </div>
+      <div id="legendDiv"></div>
+    </div>
+</body>
+</html>
